@@ -1,11 +1,9 @@
-import Navbar from '@/app/components/Navbar'
-import HeroSection from '@/app/components/HeroSection'
+import SignupPage from "./signup/page";
 
 export default function Home() {
   return (
     <>
-      <Navbar/>
-      <HeroSection/>
+      <SignupPage/>
     </>
   );
 }
