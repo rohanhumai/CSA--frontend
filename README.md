@@ -40,4 +40,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 Frontend for Course Selling App built using React
 >>>>>>> 7a90eb3f14ccc928b52e71ad0c9b55a6a1e02ef8
 
-added Signup Endpoint to it
+removed the Signup endpoint 
