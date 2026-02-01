@@ -1,9 +1,9 @@
-// import SignupPage from "./signup/page";
+import { Navbar } from "./components/Navbar";
 
 export default function Home() {
   return (
     <>
-      {/* <SignupPage/> */}
+    <Navbar />
     </>
   );
 }
