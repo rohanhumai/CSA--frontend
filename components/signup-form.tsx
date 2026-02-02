@@ -1,11 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
 
 export function SignupForm() {
   const [email, setEmail] = useState("")
@@ -29,7 +34,7 @@ export function SignupForm() {
 
       const data = await res.json()
       setMessage(data.message)
-    } catch (err) {
+    } catch {
       setMessage("Something went wrong")
     }
 
@@ -37,42 +42,46 @@ export function SignupForm() {
   }
 
   return (
-    <Card className="border shadow-2xl bg-white">
-      <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>Enter your details to sign up</CardDescription>
+    <Card className="border-2 border-zinc-300 bg-card/69 backdrop-blur-xl shadow-xl">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-semibold">
+          Create an account
+        </CardTitle>
+        <CardDescription className="text-sm">
+          Enter your details
+        </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <form onSubmit={handleSignup} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label>First Name</Label>
-            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+        <form onSubmit={handleSignup} className="grid gap-3">
+          <div className="grid gap-1">
+            <Label className="text-sm">First Name</Label>
+            <Input className="h-9 bg-input/60" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           </div>
 
-          <div className="grid gap-2">
-            <Label>Last Name</Label>
-            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          <div className="grid gap-1">
+            <Label className="text-sm">Last Name</Label>
+            <Input className="h-9 bg-input/60" value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
 
-          <div className="grid gap-2">
-            <Label>Email</Label>
-            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <div className="grid gap-1">
+            <Label className="text-sm">Email</Label>
+            <Input type="email" className="h-9 bg-input/60" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
-          <div className="grid gap-2">
-            <Label>Password</Label>
-            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <div className="grid gap-1">
+            <Label className="text-sm">Password</Label>
+            <Input type="password" className="h-9 bg-input/60" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           {message && (
-            <p className="text-sm text-center text-muted-foreground">
+            <p className="text-xs text-center text-muted-foreground pt-1">
               {message}
             </p>
           )}
 
-          <Button className="bg-black text-white hover:bg-zinc-800 transition-all" type="submit" disabled={loading}>
-            {loading ? "Creating account..." : "Sign Up"}
+          <Button type="submit" disabled={loading} className="h-9 mt-2 text-sm shadow-md">
+            {loading ? "Creating..." : "Sign Up"}
           </Button>
         </form>
       </CardContent>
