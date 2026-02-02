@@ -37,7 +37,7 @@ export function SignupForm() {
   }
 
   return (
-    <Card>
+    <Card className="border shadow-2xl bg-white">
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
         <CardDescription>Enter your details to sign up</CardDescription>
@@ -47,22 +47,22 @@ export function SignupForm() {
         <form onSubmit={handleSignup} className="grid gap-4">
           <div className="grid gap-2">
             <Label>First Name</Label>
-            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           </div>
 
           <div className="grid gap-2">
             <Label>Last Name</Label>
-            <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
 
           <div className="grid gap-2">
             <Label>Email</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           <div className="grid gap-2">
             <Label>Password</Label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input className="bg-zinc-50 border-zinc-300 focus:border-black focus:ring-black" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           {message && (
@@ -71,7 +71,7 @@ export function SignupForm() {
             </p>
           )}
 
-          <Button type="submit" disabled={loading}>
+          <Button className="bg-black text-white hover:bg-zinc-800 transition-all" type="submit" disabled={loading}>
             {loading ? "Creating account..." : "Sign Up"}
           </Button>
         </form>
