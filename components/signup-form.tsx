@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +12,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Github } from "lucide-react"
 
 export function SignupForm() {
   const [email, setEmail] = useState("")
@@ -42,36 +45,63 @@ export function SignupForm() {
   }
 
   return (
-    <Card className="border-2 border-zinc-300 bg-card/69 backdrop-blur-xl shadow-xl">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-xl font-semibold">
-          Create an account
-        </CardTitle>
-        <CardDescription className="text-sm">
-          Enter your details
+    <Card className="border-2 border-border bg-card shadow-xl">
+      <CardHeader className="text-center space-y-1 pb-3">
+        <CardTitle className="text-2xl">Create account</CardTitle>
+        <CardDescription>
+          Continue with Google or GitHub
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
-        <form onSubmit={handleSignup} className="grid gap-3">
-          <div className="grid gap-1">
-            <Label className="text-sm">First Name</Label>
-            <Input className="h-9 bg-input/60" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-          </div>
+      <CardContent className="space-y-4">
+        {/* OAuth Buttons */}
+        <Button
+          variant="outline"
+          className="w-full h-10"
+          onClick={() => signIn("google")}
+        >
+          Continue with Google
+        </Button>
 
-          <div className="grid gap-1">
-            <Label className="text-sm">Last Name</Label>
-            <Input className="h-9 bg-input/60" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+        <Button
+          variant="outline"
+          className="w-full h-10 gap-2"
+          onClick={() => signIn("github")}
+        >
+          <Github className="size-4" />
+          Continue with GitHub
+        </Button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-2">
+          <Separator className="flex-1" />
+          <span className="text-xs text-muted-foreground">
+            Or signup with email
+          </span>
+          <Separator className="flex-1" />
+        </div>
+
+        {/* Normal Form */}
+        <form onSubmit={handleSignup} className="grid gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-1">
+              <Label className="text-sm">First Name</Label>
+              <Input className="h-9" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            </div>
+            <div className="grid gap-1">
+              <Label className="text-sm">Last Name</Label>
+              <Input className="h-9" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            </div>
           </div>
 
           <div className="grid gap-1">
             <Label className="text-sm">Email</Label>
-            <Input type="email" className="h-9 bg-input/60" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input type="email" className="h-9" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           <div className="grid gap-1">
             <Label className="text-sm">Password</Label>
-            <Input type="password" className="h-9 bg-input/60" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Input type="password" className="h-9" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           {message && (
@@ -80,7 +110,7 @@ export function SignupForm() {
             </p>
           )}
 
-          <Button type="submit" disabled={loading} className="h-9 mt-2 text-sm shadow-md">
+          <Button type="submit" disabled={loading} className="h-10 mt-2">
             {loading ? "Creating..." : "Sign Up"}
           </Button>
         </form>

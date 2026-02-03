@@ -2,6 +2,7 @@
 // import { Homepage } from "./Pages/Homepage";
 // import { Cta } from "./components/Cta";
 import Signup from "./signup/page";
+import Login from "./login/page";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
     <Homepage />
     <Cta /> */}
     <Signup />
+    <Login/>
     </>
   );
 }
