@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
     "@solana/wallet-adapter-base": "^0.9.23",

@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+const path = require("path");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Required for Solana wallet adapter buffers
+  outputFileTracingRoot: path.resolve(__dirname),
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,

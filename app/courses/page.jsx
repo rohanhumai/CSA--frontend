@@ -1,8 +1,9 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { Search, Filter, Loader2 } from "lucide-react";
+import { Search, Loader2, Clock, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import CourseCard from "@/components/CourseCard";
-import api from "@/utils/api";
+import api from "@/utils.api";
 
 const categories = [
   "All",
@@ -24,7 +25,7 @@ export default function Courses() {
   const [level, setLevel] = useState("All");
 
   useEffect(() => {
-    fetchCourses();
+    void fetchCourses();
   }, [category, level]);
 
   const fetchCourses = async () => {
@@ -36,9 +37,10 @@ export default function Courses() {
       if (search) params.search = search;
 
       const { data } = await api.get("/courses", { params });
-      setCourses(data.courses);
+      setCourses(data.courses || []);
     } catch (err) {
       console.error(err);
+      setCourses([]);
     } finally {
       setLoading(false);
     }
@@ -46,12 +48,11 @@ export default function Courses() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchCourses();
+    void fetchCourses();
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
       <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold mb-2">
           Explore <span className="gradient-text">Courses</span>
@@ -61,7 +62,6 @@ export default function Courses() {
         </p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col lg:flex-row gap-4 mb-8">
         <form onSubmit={handleSearch} className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-400" />
@@ -100,7 +100,6 @@ export default function Courses() {
         </div>
       </div>
 
-      {/* Category pills */}
       <div className="flex gap-2 flex-wrap mb-8">
         {categories.map((c) => (
           <button
@@ -117,7 +116,6 @@ export default function Courses() {
         ))}
       </div>
 
-      {/* Courses grid */}
       {loading ? (
         <div className="flex justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
@@ -125,9 +123,7 @@ export default function Courses() {
       ) : courses.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-dark-400 text-lg">No courses found.</p>
-          <p className="text-dark-500 text-sm mt-2">
-            Try adjusting your filters.
-          </p>
+          <p className="text-dark-500 text-sm mt-2">Try adjusting your filters.</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -172,9 +168,7 @@ export default function Courses() {
 
                 <div className="flex items-center justify-between pt-4 border-t border-dark-700/50">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-white">
-                      ₹{course.price}
-                    </span>
+                    <span className="text-2xl font-bold text-white">Rs. {course.price}</span>
                     <span className="text-sm text-purple-400 font-medium">
                       / {course.priceInSol} SOL
                     </span>

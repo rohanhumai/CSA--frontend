@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import {
   Menu,
@@ -72,7 +75,7 @@ export default function Navbar() {
               </>
             ) : (
               <div className="flex items-center gap-3 ml-2">
-                <Link href="/signin" className="btn-ghost">
+                <Link href="/login" className="btn-ghost">
                   Sign In
                 </Link>
                 <Link
@@ -125,7 +128,7 @@ export default function Navbar() {
             ) : (
               <>
                 <Link
-                  href="/signin"
+                  href="/login"
                   className="block py-2 px-3 rounded-lg hover:bg-dark-800"
                   onClick={() => setOpen(false)}
                 >

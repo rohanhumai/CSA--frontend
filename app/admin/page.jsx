@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -10,7 +12,7 @@ import {
   Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import api from "@/utils/api";
+import api from "@/utils.api";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);

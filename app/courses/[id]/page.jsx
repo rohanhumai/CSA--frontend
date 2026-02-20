@@ -1,14 +1,26 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { Clock, Users, Star, CheckCircle2, PlayCircle, ChevronDown, Shield } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import {
+  Clock,
+  Users,
+  Star,
+  CheckCircle2,
+  PlayCircle,
+  ChevronDown,
+  ChevronUp,
+  Shield,
+} from "lucide-react";
 import toast from "react-hot-toast";
-import api from "@/utils/api";
+import api from "@/utils.api";
 import { useAuth } from "@/context/AuthContext";
 import PaymentModal from "@/components/PaymentModal";
 
 export default function CourseDetail() {
   const router = useRouter();
-  const { id } = router.query;
+  const params = useParams();
+  const id = params?.id;
   const { user } = useAuth();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,8 +30,8 @@ export default function CourseDetail() {
 
   useEffect(() => {
     if (id) {
-      fetchCourse();
-      if (user) checkPurchase();
+      void fetchCourse();
+      if (user) void checkPurchase();
     }
   }, [id, user]);
 
@@ -27,7 +39,7 @@ export default function CourseDetail() {
     try {
       const { data } = await api.get(`/courses/${id}`);
       setCourse(data.course);
-    } catch (err) {
+    } catch {
       toast.error("Course not found.");
       router.push("/courses");
     } finally {
@@ -38,14 +50,16 @@ export default function CourseDetail() {
   const checkPurchase = async () => {
     try {
       const { data } = await api.get(`/user/check-purchase/${id}`);
-      setPurchased(data.purchased);
-    } catch (err) {}
+      setPurchased(Boolean(data.purchased));
+    } catch {
+      setPurchased(false);
+    }
   };
 
   const handleBuy = () => {
     if (!user) {
       toast.error("Please sign in to purchase.");
-      router.push("/signin");
+      router.push("/login");
       return;
     }
     setShowPayment(true);
@@ -67,7 +81,6 @@ export default function CourseDetail() {
 
   return (
     <div>
-      {/* Hero section */}
       <div className="relative bg-dark-900/50 border-b border-dark-700/50">
         <div className="absolute inset-0">
           <img src={course.imageUrl} alt="" className="w-full h-full object-cover opacity-5" />
@@ -90,9 +103,7 @@ export default function CourseDetail() {
                 {course.title}
               </h1>
 
-              <p className="text-dark-300 text-lg mb-6 leading-relaxed">
-                {course.description}
-              </p>
+              <p className="text-dark-300 text-lg mb-6 leading-relaxed">{course.description}</p>
 
               <div className="flex flex-wrap items-center gap-6 text-dark-300">
                 <span className="flex items-center gap-2">
@@ -116,7 +127,6 @@ export default function CourseDetail() {
               </div>
             </div>
 
-            {/* Purchase card */}
             <div className="lg:col-span-1">
               <div className="card p-6 sticky top-24">
                 <img
@@ -126,7 +136,7 @@ export default function CourseDetail() {
                 />
 
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-4xl font-black">₹{course.price}</span>
+                  <span className="text-4xl font-black">Rs. {course.price}</span>
                   <span className="text-purple-400 font-semibold">/ {course.priceInSol} SOL</span>
                 </div>
 
@@ -156,7 +166,6 @@ export default function CourseDetail() {
         </div>
       </div>
 
-      {/* Syllabus */}
       {course.syllabus && course.syllabus.length > 0 && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <h2 className="text-2xl font-bold mb-8">
@@ -204,7 +213,6 @@ export default function CourseDetail() {
         </div>
       )}
 
-      {/* Payment Modal */}
       {showPayment && (
         <PaymentModal
           course={course}
