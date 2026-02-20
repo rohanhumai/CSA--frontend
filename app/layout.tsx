@@ -1,33 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { AuthProvider } from "@/context/AuthContext";
+import {
+  WalletProvider,
+  WalletModalProvider,
+} from "@solana/wallet-adapter-react";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { clusterApiUrl } from "@solana/web3.js";
+import { Button as WalletButton } from "@solana/wallet-adapter-react-ui";
+import "@solana/wallet-adapter-react-ui/styles.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "CourseVault",
-  description: "Course selling app with secure image-only lesson viewing.",
+export const metadata = {
+  title: "CourseChain — Learn. Build. Earn.",
+  description: "Web3-powered learning platform",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const network = "devnet";
+const endpoint = clusterApiUrl(network);
+const wallets = [new PhantomWalletAdapter()];
+
+export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" className="dark">
+      <body>
+        <AuthProvider>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>
+              <Navbar />
+              <main className="min-h-screen flex flex-col">{children}</main>
+              <Footer />
+            </WalletModalProvider>
+          </WalletProvider>
+        </AuthProvider>
       </body>
     </html>
   );
