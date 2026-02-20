@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { signin } from "@/lib/api";
-import { storeAuth } from "@/lib/auth";
+import { adminSignin } from "@/lib/api";
+import { storeAdminAuth } from "@/lib/auth";
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,10 +18,10 @@ export default function LoginPage() {
     setStatus("Signing in...");
 
     try {
-      const token = await signin({ email, password });
-      storeAuth(token, email);
+      const token = await adminSignin({ email, password });
+      storeAdminAuth(token, email);
       setStatus("Signed in");
-      router.push("/courses");
+      router.push("/admin/courses");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Signin failed");
     } finally {
@@ -34,20 +33,14 @@ export default function LoginPage() {
     <main className="shell">
       <section className="auth-layout">
         <aside className="card auth-showcase">
-          <p className="eyebrow">CourseVault</p>
-          <h2>Welcome back to your learning dashboard</h2>
-          <p>Track your purchased courses, resume instantly, and watch in protected mode.</p>
-          <ul>
-            <li>Structured course journeys</li>
-            <li>Clean chapter-style visual lessons</li>
-            <li>Secure watch-only viewer</li>
-          </ul>
+          <p className="eyebrow">Admin access</p>
+          <h2>Course management panel</h2>
+          <p>Create and update course listings directly from your dashboard.</p>
         </aside>
 
         <section className="card auth-card">
-          <p className="eyebrow">Account</p>
-          <h1 className="title">Sign in</h1>
-          <p className="muted">Continue to purchase and watch image-based courses.</p>
+          <p className="eyebrow">Admin</p>
+          <h1 className="title">Login</h1>
 
           <form className="form" onSubmit={onSubmit}>
             <label>
@@ -69,15 +62,12 @@ export default function LoginPage() {
               />
             </label>
             <button className="btn-primary" disabled={loading} type="submit">
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing in..." : "Login"}
             </button>
           </form>
 
           {status && <p className="status">{status}</p>}
-
-          <p className="muted">
-            No account? <Link href="/signup">Create one</Link>
-          </p>
+          <p className="muted">If you need access, ask the system owner to seed your account.</p>
         </section>
       </section>
     </main>
