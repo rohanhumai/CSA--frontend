@@ -71,7 +71,28 @@ export default function MyCoursesPage() {
         ) : (
           <section className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {courses.map((course) => (
-              <CourseCard key={course._id} course={course} />
+              <CourseCard key={course._id} course={course}>
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Course PDFs</p>
+                  {Array.isArray(course.pdfs) && course.pdfs.length > 0 ? (
+                    <div className="mt-2 space-y-2">
+                      {course.pdfs.map((pdf) => (
+                        <a
+                          key={pdf._id || pdf.url}
+                          href={api.toAbsoluteFileUrl(pdf.url)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block rounded-md border border-teal-200 bg-white px-3 py-2 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:underline"
+                        >
+                          View PDF: {pdf.title}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-slate-500">No PDFs available in this course yet.</p>
+                  )}
+                </div>
+              </CourseCard>
             ))}
           </section>
         )
