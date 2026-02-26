@@ -6,11 +6,52 @@ const jsonHeaders = (token) => ({
   ...(token ? { Authorization: `Bearer ${token}` } : {}),
 });
 
+const parseJsonSafely = async (res) => {
+  try {
+    return await res.json();
+  } catch {
+    return {};
+  }
+};
+
+const authorizedFetch = async (url, token, options = {}) =>
+  fetch(url, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
 export const api = {
-  async getCourses(admin = false) {
-    const res = await fetch(`${API_BASE}/courses${admin ? "?admin=1" : ""}`);
+  async getCourses({ admin = false, token = "" } = {}) {
+    const res = await fetch(`${API_BASE}/courses${admin ? "?admin=1" : ""}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
     if (!res.ok) throw new Error("Failed to fetch courses");
     return res.json();
+  },
+
+  async signup({ name, email, password }) {
+    const res = await fetch(`${API_BASE}/auth/signup`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ name, email, password }),
+    });
+    const data = await parseJsonSafely(res);
+    if (!res.ok) throw new Error(data.message || "Signup failed");
+    return data;
+  },
+
+  async login({ email, password }) {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await parseJsonSafely(res);
+    if (!res.ok) throw new Error(data.message || "Login failed");
+    return data;
   },
 
   async adminLogin(email, password) {
@@ -19,7 +60,7 @@ export const api = {
       headers: jsonHeaders(),
       body: JSON.stringify({ email, password }),
     });
-    const data = await res.json();
+    const data = await parseJsonSafely(res);
     if (!res.ok) throw new Error(data.message || "Login failed");
     return data;
   },
@@ -30,7 +71,7 @@ export const api = {
       headers: jsonHeaders(token),
       body: JSON.stringify(payload),
     });
-    const data = await res.json();
+    const data = await parseJsonSafely(res);
     if (!res.ok) throw new Error(data.message || "Create course failed");
     return data;
   },
@@ -41,7 +82,7 @@ export const api = {
       headers: jsonHeaders(token),
       body: JSON.stringify(payload),
     });
-    const data = await res.json();
+    const data = await parseJsonSafely(res);
     if (!res.ok) throw new Error(data.message || "Update course failed");
     return data;
   },
@@ -51,12 +92,11 @@ export const api = {
     formData.append("pdf", pdfFile);
     if (title) formData.append("title", title);
 
-    const res = await fetch(`${API_BASE}/courses/${courseId}/pdf`, {
+    const res = await authorizedFetch(`${API_BASE}/courses/${courseId}/pdf`, token, {
       method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       body: formData,
     });
-    const data = await res.json();
+    const data = await parseJsonSafely(res);
     if (!res.ok) throw new Error(data.message || "PDF upload failed");
     return data;
   },
@@ -66,12 +106,55 @@ export const api = {
       method: "DELETE",
       headers: jsonHeaders(token),
     });
-    const data = await res.json();
+    const data = await parseJsonSafely(res);
     if (!res.ok) throw new Error(data.message || "PDF delete failed");
     return data;
   },
 
-  toAbsoluteFileUrl(url) {
+  async createRazorpayOrder(courseId, token) {
+    const res = await fetch(`${API_BASE}/payments/razorpay/order`, {
+      method: "POST",
+      headers: jsonHeaders(token),
+      body: JSON.stringify({ courseId }),
+    });
+    const data = await parseJsonSafely(res);
+    if (!res.ok) throw new Error(data.message || "Failed to create payment order");
+    return data;
+  },
+
+  async verifyRazorpayPayment(payload, token) {
+    const res = await fetch(`${API_BASE}/payments/razorpay/verify`, {
+      method: "POST",
+      headers: jsonHeaders(token),
+      body: JSON.stringify(payload),
+    });
+    const data = await parseJsonSafely(res);
+    if (!res.ok) throw new Error(data.message || "Payment verification failed");
+    return data;
+  },
+
+  async getMyCourses(token) {
+    const res = await fetch(`${API_BASE}/payments/my-courses`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+    const data = await parseJsonSafely(res);
+    if (!res.ok) throw new Error(data.message || "Failed to fetch your courses");
+    return data;
+  },
+
+  async openPdfInNewTab(courseId, pdfId, token) {
+    const res = await authorizedFetch(`${API_BASE}/courses/${courseId}/pdfs/${pdfId}/view`, token);
+    if (!res.ok) {
+      const data = await parseJsonSafely(res);
+      throw new Error(data.message || "Failed to open PDF");
+    }
+
+    const blob = await res.blob();
+    const pdfUrl = window.URL.createObjectURL(blob);
+    window.open(pdfUrl, "_blank", "noopener,noreferrer");
+  },
+
+  toAbsoluteApiUrl(url) {
     if (!url) return "";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
     return `${API_ORIGIN}${url.startsWith("/") ? "" : "/"}${url}`;

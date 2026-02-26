@@ -1,36 +1,29 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { api } from "../api";
 import AppLayout from "../components/AppLayout";
-
-const getUsers = () => {
-  try {
-    return JSON.parse(window.localStorage.getItem("users") || "[]");
-  } catch {
-    return [];
-  }
-};
 
 export default function SignupPage() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-    const users = getUsers();
-    const exists = users.some((user) => user.email.toLowerCase() === form.email.toLowerCase());
-    if (exists) {
-      setMessage("User already exists. Please login.");
-      return;
+    try {
+      await api.signup(form);
+      setMessage("Signup successful. Redirecting to login...");
+      setTimeout(() => router.push("/login"), 700);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
     }
-
-    const nextUsers = [...users, { ...form }];
-    window.localStorage.setItem("users", JSON.stringify(nextUsers));
-    setMessage("Signup successful. Redirecting to login...");
-    setTimeout(() => router.push("/login"), 700);
   };
 
   return (
@@ -55,14 +48,18 @@ export default function SignupPage() {
           />
           <input
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500"
-            placeholder="Password"
+            placeholder="Password (min 8 chars)"
             type="password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
-          <button type="submit" className="w-full rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-700">
-            Create Account
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            {loading ? "Creating..." : "Create Account"}
           </button>
         </form>
         {message ? <p className="mt-3 text-sm text-slate-600">{message}</p> : null}

@@ -1,38 +1,31 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { api } from "../api";
 import AppLayout from "../components/AppLayout";
-
-const getUsers = () => {
-  try {
-    return JSON.parse(window.localStorage.getItem("users") || "[]");
-  } catch {
-    return [];
-  }
-};
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setLoading(true);
 
-    const users = getUsers();
-    const user = users.find(
-      (item) => item.email.toLowerCase() === form.email.toLowerCase() && item.password === form.password
-    );
-
-    if (!user) {
-      setMessage("Invalid email or password.");
-      return;
+    try {
+      const data = await api.login(form);
+      window.localStorage.setItem("userToken", data.token);
+      window.localStorage.setItem("currentUser", JSON.stringify(data.user));
+      setMessage("Login successful. Redirecting...");
+      setTimeout(() => router.push("/all-courses"), 700);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
     }
-
-    window.localStorage.setItem("currentUser", JSON.stringify({ name: user.name, email: user.email }));
-    setMessage("Login successful. Redirecting...");
-    setTimeout(() => router.push("/all-courses"), 700);
   };
 
   return (
@@ -56,8 +49,12 @@ export default function LoginPage() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
-          <button type="submit" className="w-full rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-700">
-            Login
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
         {message ? <p className="mt-3 text-sm text-slate-600">{message}</p> : null}

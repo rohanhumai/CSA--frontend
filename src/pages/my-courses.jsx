@@ -4,23 +4,18 @@ import { api } from "../api";
 import AppLayout from "../components/AppLayout";
 import CourseCard from "../components/CourseCard";
 
-const getStoredCourseIds = () => {
-  try {
-    return JSON.parse(window.localStorage.getItem("myCourseIds") || "[]");
-  } catch {
-    return [];
-  }
-};
-
 export default function MyCoursesPage() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState("");
+  const [openingPdfId, setOpeningPdfId] = useState("");
 
   useEffect(() => {
-    const currentUser = window.localStorage.getItem("currentUser");
-    const loggedIn = Boolean(currentUser);
+    const userToken = window.localStorage.getItem("userToken") || "";
+    setToken(userToken);
+    const loggedIn = Boolean(userToken);
     setIsLoggedIn(loggedIn);
 
     const loadMyCourses = async () => {
@@ -30,9 +25,8 @@ export default function MyCoursesPage() {
       }
 
       try {
-        const ids = getStoredCourseIds();
-        const data = await api.getCourses();
-        setCourses(data.filter((course) => ids.includes(course._id)));
+        const data = await api.getMyCourses(userToken);
+        setCourses(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -43,16 +37,32 @@ export default function MyCoursesPage() {
     loadMyCourses();
   }, []);
 
+  const handleOpenPdf = async (courseId, pdfId) => {
+    try {
+      setOpeningPdfId(pdfId);
+      setError("");
+      await api.openPdfInNewTab(courseId, pdfId, token);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setOpeningPdfId("");
+    }
+  };
+
   return (
     <AppLayout>
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">My Courses</h2>
-        <p className="mt-2 text-slate-600">Your enrolled courses are shown here.</p>
+        <p className="mt-2 text-slate-600">Only courses you purchased are shown here.</p>
       </section>
 
       {!isLoggedIn ? (
         <p className="mt-4 text-slate-600">
-          Please <Link href="/login" className="font-semibold text-teal-700">login</Link> to view your courses.
+          Please{" "}
+          <Link href="/login" className="font-semibold text-teal-700">
+            login
+          </Link>{" "}
+          to view your purchased courses.
         </p>
       ) : null}
 
@@ -62,7 +72,7 @@ export default function MyCoursesPage() {
       {isLoggedIn && !loading && !error ? (
         courses.length === 0 ? (
           <p className="mt-4 text-slate-500">
-            You have no courses yet.{" "}
+            You have no purchased courses yet.{" "}
             <Link href="/all-courses" className="font-semibold text-teal-700">
               Browse all courses
             </Link>
@@ -77,15 +87,15 @@ export default function MyCoursesPage() {
                   {Array.isArray(course.pdfs) && course.pdfs.length > 0 ? (
                     <div className="mt-2 space-y-2">
                       {course.pdfs.map((pdf) => (
-                        <a
-                          key={pdf._id || pdf.url}
-                          href={api.toAbsoluteFileUrl(pdf.url)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="block rounded-md border border-teal-200 bg-white px-3 py-2 text-sm font-semibold text-teal-700 hover:bg-teal-50 hover:underline"
+                        <button
+                          type="button"
+                          key={pdf._id}
+                          onClick={() => handleOpenPdf(course._id, pdf._id)}
+                          disabled={openingPdfId === pdf._id}
+                          className="block w-full rounded-md border border-teal-200 bg-white px-3 py-2 text-left text-sm font-semibold text-teal-700 hover:bg-teal-50 disabled:cursor-not-allowed disabled:bg-slate-100"
                         >
-                          View PDF: {pdf.title}
-                        </a>
+                          {openingPdfId === pdf._id ? "Opening..." : `View PDF: ${pdf.title}`}
+                        </button>
                       ))}
                     </div>
                   ) : (

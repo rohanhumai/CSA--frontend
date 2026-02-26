@@ -33,7 +33,7 @@ export default function AdminPage() {
 
   const fetchAdminCourses = async () => {
     try {
-      const data = await api.getCourses(true);
+      const data = await api.getCourses({ admin: true, token });
       setCourses(data);
     } catch (err) {
       if ((err.message || "").toLowerCase().includes("failed")) {
@@ -353,14 +353,7 @@ export default function AdminPage() {
                     key={pdf._id}
                     className="flex flex-col gap-2 rounded-lg border border-slate-200 p-2 md:flex-row md:items-center md:justify-between"
                   >
-                    <a
-                      href={api.toAbsoluteFileUrl(pdf.url)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm font-semibold text-teal-700 hover:underline"
-                    >
-                      {pdf.title}
-                    </a>
+                    <p className="text-sm font-semibold text-slate-700">{pdf.title}</p>
                     <button
                       type="button"
                       onClick={() => handleDeletePdf(pdf._id)}
