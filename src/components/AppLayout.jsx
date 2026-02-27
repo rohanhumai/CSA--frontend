@@ -6,13 +6,14 @@ import { session } from "../lib/session";
 const navItemClass = (active) =>
   [
     "rounded-full px-4 py-2 text-sm font-semibold transition",
-    active ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-white/70 hover:text-slate-900",
+    active ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-blue-50 hover:text-blue-700",
   ].join(" ");
 
 const variants = {
   marketing: {
     container: "mx-auto w-[94vw] max-w-6xl py-8 md:py-10",
-    shell: "rounded-3xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/80 p-5 shadow-sm md:p-8",
+    shell:
+      "rounded-3xl border border-blue-200/70 bg-gradient-to-b from-[#eef4ff] via-white to-[#f3f8ff] p-4 shadow-[0_18px_50px_-30px_rgba(37,99,235,0.45)] md:p-6",
     title: "CourseSphere",
     subtitle: "MERN + Solana",
     nav: [
@@ -24,7 +25,8 @@ const variants = {
   },
   auth: {
     container: "mx-auto flex min-h-screen w-[94vw] max-w-6xl items-center py-10",
-    shell: "w-full rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm backdrop-blur md:p-8",
+    shell:
+      "w-full rounded-3xl border border-blue-200/70 bg-gradient-to-br from-white via-[#f5f8ff] to-[#edf3ff] p-5 shadow-[0_18px_50px_-30px_rgba(37,99,235,0.45)] md:p-8",
     title: "Account Access",
     subtitle: "Secure login and onboarding",
     nav: [{ href: "/", label: "Back Home" }],
@@ -32,7 +34,8 @@ const variants = {
   },
   student: {
     container: "mx-auto w-[94vw] max-w-6xl py-8 md:py-10",
-    shell: "rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm md:p-8",
+    shell:
+      "rounded-3xl border border-blue-200/70 bg-gradient-to-b from-white to-[#f5f9ff] p-4 shadow-[0_18px_50px_-30px_rgba(37,99,235,0.45)] md:p-6",
     title: "CourseSphere Student",
     subtitle: "Learn from purchased course libraries",
     nav: [
@@ -43,7 +46,8 @@ const variants = {
   },
   admin: {
     container: "mx-auto w-[94vw] max-w-7xl py-8 md:py-10",
-    shell: "rounded-3xl border border-amber-200/70 bg-gradient-to-b from-white to-amber-50/40 p-5 shadow-sm md:p-8",
+    shell:
+      "rounded-3xl border border-blue-200/70 bg-gradient-to-b from-white to-[#f4f7ff] p-4 shadow-[0_18px_50px_-30px_rgba(37,99,235,0.45)] md:p-6",
     title: "CourseSphere Admin",
     subtitle: "Manage courses, PYQs, and PDFs",
     nav: [{ href: "/admin", label: "Overview" }],
@@ -92,7 +96,7 @@ export default function AppLayout({ children, variant = "student" }) {
         </Link>
         <Link
           href="/signup"
-          className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+          className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
         >
           Sign up
         </Link>
@@ -103,14 +107,15 @@ export default function AppLayout({ children, variant = "student" }) {
   return (
     <div className={config.container}>
       <div className={config.shell}>
-        <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <header className="mb-6 rounded-2xl border border-blue-100/80 bg-white/85 p-4 backdrop-blur md:mb-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-['Manrope'] text-xs uppercase tracking-[0.16em] text-slate-500">{config.subtitle}</p>
+            <p className="font-['Manrope'] text-xs uppercase tracking-[0.16em] text-blue-600">{config.subtitle}</p>
             <div className="flex items-center gap-2">
               <h1 className="font-['Sora'] text-3xl font-bold text-slate-900">{config.title}</h1>
               {variant === "marketing" ? (
-                <span className="rounded-full border border-teal-200 bg-teal-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-700">
-                  Live
+                <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-blue-700">
+                  Trusted
                 </span>
               ) : null}
             </div>
@@ -125,6 +130,7 @@ export default function AppLayout({ children, variant = "student" }) {
           </nav>
 
           {authAction ? <div>{authAction}</div> : null}
+          </div>
         </header>
 
         <main>{children}</main>
