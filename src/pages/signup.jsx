@@ -27,9 +27,10 @@ export default function SignupPage() {
   };
 
   return (
-    <AppLayout>
-      <section className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">Signup</h2>
+    <AppLayout variant="auth">
+      <section className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">Create Your Account</h2>
+        <p className="mt-1 text-sm text-slate-600">Set up your profile and start unlocking premium PYQ courses.</p>
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           <input
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500"
@@ -73,3 +74,4 @@ export default function SignupPage() {
     </AppLayout>
   );
 }
+

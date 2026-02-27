@@ -177,7 +177,7 @@ export default function AdminPage() {
 
   if (!hydrated) {
     return (
-      <AppLayout>
+      <AppLayout variant="admin">
         <p className="text-slate-500">Loading admin panel...</p>
       </AppLayout>
     );
@@ -185,7 +185,7 @@ export default function AdminPage() {
 
   if (!token) {
     return (
-      <AppLayout>
+      <AppLayout variant="admin">
         <section className="max-w-md rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">Admin Login</h2>
           <form className="mt-4 space-y-3" onSubmit={handleLogin}>
@@ -217,7 +217,7 @@ export default function AdminPage() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout variant="admin">
       <section className="grid gap-4 lg:grid-cols-[300px_1fr]">
         <aside className="max-h-[72vh] overflow-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
@@ -381,3 +381,4 @@ export default function AdminPage() {
     </AppLayout>
   );
 }
+

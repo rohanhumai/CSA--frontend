@@ -1,6 +1,6 @@
 function CourseCard({ course, actionLabel = "", onAction, actionDisabled = false, children = null }) {
   return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <article className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-center justify-between gap-3">
         <p className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">{course.category}</p>
         <p className="text-sm font-bold text-slate-800">Rs {Number(course.price).toLocaleString()}</p>

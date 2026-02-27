@@ -121,7 +121,7 @@ export default function AllCoursesPage() {
   const hasAnyPurchased = useMemo(() => courses.some((course) => course.hasPurchased), [courses]);
 
   return (
-    <AppLayout>
+    <AppLayout variant="student">
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">All Courses</h2>
         <p className="mt-2 text-slate-600">Sign in to purchase, then access PDFs only after successful payment.</p>
@@ -157,3 +157,4 @@ export default function AllCoursesPage() {
     </AppLayout>
   );
 }
+
