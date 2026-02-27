@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { api } from "../api";
 import AppLayout from "../components/AppLayout";
 import CourseCard from "../components/CourseCard";
+import { session } from "../lib/session";
 
 const loadRazorpayScript = () =>
   new Promise((resolve) => {
@@ -30,6 +31,9 @@ export default function AllCoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [token, setToken] = useState("");
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [sort, setSort] = useState("popular");
 
   const isLoggedIn = Boolean(token);
 
@@ -39,7 +43,7 @@ export default function AllCoursesPage() {
   };
 
   useEffect(() => {
-    const userToken = window.localStorage.getItem("userToken") || "";
+    const userToken = session.getUserToken();
     setToken(userToken);
 
     const bootstrap = async () => {
@@ -119,12 +123,85 @@ export default function AllCoursesPage() {
   };
 
   const hasAnyPurchased = useMemo(() => courses.some((course) => course.hasPurchased), [courses]);
+  const categories = useMemo(() => {
+    const values = Array.from(new Set(courses.map((course) => course.category).filter(Boolean)));
+    return ["All", ...values];
+  }, [courses]);
+  const filteredCourses = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const prepared = courses.filter((course) => {
+      const byCategory = category === "All" || course.category === category;
+      if (!byCategory) return false;
+      if (!query) return true;
+      const haystack = `${course.title || ""} ${course.description || ""} ${course.category || ""}`.toLowerCase();
+      return haystack.includes(query);
+    });
+
+    const sorted = [...prepared];
+    if (sort === "price-low") sorted.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+    if (sort === "price-high") sorted.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+    if (sort === "name") sorted.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    if (sort === "popular") sorted.sort((a, b) => Number(b.pyqs?.length || 0) - Number(a.pyqs?.length || 0));
+    return sorted;
+  }, [category, courses, search, sort]);
+  const totalCourses = courses.length;
+  const totalPyqs = useMemo(
+    () => courses.reduce((sum, course) => sum + Number(course.pyqs?.length || 0), 0),
+    [courses]
+  );
 
   return (
     <AppLayout variant="student">
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">All Courses</h2>
-        <p className="mt-2 text-slate-600">Sign in to purchase, then access PDFs only after successful payment.</p>
+        <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">Course Catalog</h2>
+        <p className="mt-2 text-slate-600">Discover, compare, and unlock exam-focused PYQ courses.</p>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Published Courses</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{totalCourses}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs uppercase tracking-[0.12em] text-slate-500">PYQs in Library</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{totalPyqs}</p>
+          </article>
+          <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Purchased</p>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{courses.filter((item) => item.hasPurchased).length}</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr]">
+          <input
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500"
+            placeholder="Search by title, category, or keyword"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            {categories.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+          <select
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="popular">Sort: Most PYQs</option>
+            <option value="price-low">Sort: Price Low to High</option>
+            <option value="price-high">Sort: Price High to Low</option>
+            <option value="name">Sort: Name A-Z</option>
+          </select>
+        </div>
       </section>
 
       {loading ? <p className="mt-4 text-slate-500">Loading courses...</p> : null}
@@ -134,11 +211,11 @@ export default function AllCoursesPage() {
       ) : null}
 
       {!loading && !error ? (
-        courses.length === 0 ? (
+        filteredCourses.length === 0 ? (
           <p className="mt-4 text-slate-500">No published courses yet.</p>
         ) : (
           <section className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course) => {
+            {filteredCourses.map((course) => {
               const enrolled = Boolean(course.hasPurchased);
               const processing = processingCourseId === course._id;
               return (

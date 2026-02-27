@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import AppLayout from "../components/AppLayout";
 import PYQEditor from "../components/PYQEditor";
+import { session } from "../lib/session";
 
 const initialForm = {
   title: "",
@@ -37,9 +38,9 @@ export default function AdminPage() {
       setCourses(data);
     } catch (err) {
       if ((err.message || "").toLowerCase().includes("failed")) {
-        const rawToken = window.localStorage.getItem("adminToken");
+        const rawToken = session.getAdminToken();
         if (rawToken) {
-          window.localStorage.removeItem("adminToken");
+          session.clearAdminToken();
           setToken("");
           setMessage("Session expired. Please login again.");
           return;
@@ -50,7 +51,7 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    const storedToken = window.localStorage.getItem("adminToken") || "";
+    const storedToken = session.getAdminToken();
     setToken(storedToken);
     setHydrated(true);
   }, []);
@@ -80,7 +81,7 @@ export default function AdminPage() {
     try {
       const data = await api.adminLogin(login.email, login.password);
       setToken(data.token);
-      window.localStorage.setItem("adminToken", data.token);
+      session.setAdminToken(data.token);
       setMessage("Admin login successful.");
     } catch (err) {
       setMessage(err.message);
@@ -125,7 +126,7 @@ export default function AdminPage() {
   };
 
   const logout = () => {
-    window.localStorage.removeItem("adminToken");
+    session.clearAdminToken();
     setToken("");
     setCourses([]);
     setSelectedId("");

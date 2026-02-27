@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
 import AppLayout from "../components/AppLayout";
 import CourseCard from "../components/CourseCard";
+import { session } from "../lib/session";
 
 export default function MyCoursesPage() {
   const [courses, setCourses] = useState([]);
@@ -13,7 +14,7 @@ export default function MyCoursesPage() {
   const [openingPdfId, setOpeningPdfId] = useState("");
 
   useEffect(() => {
-    const userToken = window.localStorage.getItem("userToken") || "";
+    const userToken = session.getUserToken();
     setToken(userToken);
     const loggedIn = Boolean(userToken);
     setIsLoggedIn(loggedIn);
@@ -48,12 +49,33 @@ export default function MyCoursesPage() {
       setOpeningPdfId("");
     }
   };
+  const totalPdfs = useMemo(
+    () => courses.reduce((sum, course) => sum + Number(course.pdfs?.length || 0), 0),
+    [courses]
+  );
 
   return (
     <AppLayout variant="student">
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">My Courses</h2>
-        <p className="mt-2 text-slate-600">Only courses you purchased are shown here.</p>
+        <h2 className="font-['Sora'] text-2xl font-semibold text-slate-900">My Learning Library</h2>
+        <p className="mt-2 text-slate-600">Access all purchased courses and revision PDFs from one dashboard.</p>
+
+        {isLoggedIn ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Purchased Courses</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{courses.length}</p>
+            </article>
+            <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Available PDFs</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{totalPdfs}</p>
+            </article>
+            <article className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Learning Status</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">{courses.length ? "Active" : "New"}</p>
+            </article>
+          </div>
+        ) : null}
       </section>
 
       {!isLoggedIn ? (
@@ -71,7 +93,7 @@ export default function MyCoursesPage() {
 
       {isLoggedIn && !loading && !error ? (
         courses.length === 0 ? (
-          <p className="mt-4 text-slate-500">
+          <p className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-slate-500">
             You have no purchased courses yet.{" "}
             <Link href="/all-courses" className="font-semibold text-teal-700">
               Browse all courses

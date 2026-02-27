@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { api } from "../api";
 import AppLayout from "../components/AppLayout";
+import { session } from "../lib/session";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,8 +18,7 @@ export default function LoginPage() {
 
     try {
       const data = await api.login(form);
-      window.localStorage.setItem("userToken", data.token);
-      window.localStorage.setItem("currentUser", JSON.stringify(data.user));
+      session.setUserAuth(data.token, data.user);
       setMessage("Login successful. Redirecting...");
       setTimeout(() => router.push("/all-courses"), 700);
     } catch (error) {

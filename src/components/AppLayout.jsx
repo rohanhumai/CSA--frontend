@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
+import { session } from "../lib/session";
 
 const navItemClass = (active) =>
   [
@@ -12,7 +13,7 @@ const variants = {
   marketing: {
     container: "mx-auto w-[94vw] max-w-6xl py-8 md:py-10",
     shell: "rounded-3xl border border-slate-200/80 bg-gradient-to-b from-white to-slate-50/80 p-5 shadow-sm md:p-8",
-    title: "Course Selling App",
+    title: "CourseSphere",
     subtitle: "MERN + Solana",
     nav: [
       { href: "/", label: "Home" },
@@ -32,7 +33,7 @@ const variants = {
   student: {
     container: "mx-auto w-[94vw] max-w-6xl py-8 md:py-10",
     shell: "rounded-3xl border border-slate-200/80 bg-white/95 p-5 shadow-sm md:p-8",
-    title: "Student Dashboard",
+    title: "CourseSphere Student",
     subtitle: "Learn from purchased course libraries",
     nav: [
       { href: "/all-courses", label: "All Courses" },
@@ -43,7 +44,7 @@ const variants = {
   admin: {
     container: "mx-auto w-[94vw] max-w-7xl py-8 md:py-10",
     shell: "rounded-3xl border border-amber-200/70 bg-gradient-to-b from-white to-amber-50/40 p-5 shadow-sm md:p-8",
-    title: "Admin Workspace",
+    title: "CourseSphere Admin",
     subtitle: "Manage courses, PYQs, and PDFs",
     nav: [{ href: "/admin", label: "Overview" }],
     cta: "none",
@@ -58,7 +59,7 @@ export default function AppLayout({ children, variant = "student" }) {
   const config = variants[variant] || variants.student;
 
   useEffect(() => {
-    const userToken = window.localStorage.getItem("userToken") || "";
+    const userToken = session.getUserToken();
     setToken(userToken);
     setHydrated(true);
   }, [router.pathname]);
@@ -71,8 +72,7 @@ export default function AppLayout({ children, variant = "student" }) {
         <button
           type="button"
           onClick={() => {
-            window.localStorage.removeItem("userToken");
-            window.localStorage.removeItem("currentUser");
+            session.clearUserAuth();
             setToken("");
             router.push("/login");
           }}
@@ -106,7 +106,14 @@ export default function AppLayout({ children, variant = "student" }) {
         <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-['Manrope'] text-xs uppercase tracking-[0.16em] text-slate-500">{config.subtitle}</p>
-            <h1 className="font-['Sora'] text-3xl font-bold text-slate-900">{config.title}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="font-['Sora'] text-3xl font-bold text-slate-900">{config.title}</h1>
+              {variant === "marketing" ? (
+                <span className="rounded-full border border-teal-200 bg-teal-50 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-teal-700">
+                  Live
+                </span>
+              ) : null}
+            </div>
           </div>
 
           <nav className="flex flex-wrap items-center gap-2">
