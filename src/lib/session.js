@@ -1,3 +1,4 @@
+//[Session.Js]
 export const session = {
   getUserToken() {
     if (typeof window === "undefined") return "";
